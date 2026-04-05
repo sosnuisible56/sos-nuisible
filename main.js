@@ -60,23 +60,30 @@ form.addEventListener('submit', async (e) => {
   btn.textContent = 'Envoi en cours...';
   btn.disabled = true;
 
-  const data = new FormData(form);
+  const formData = new FormData(form);
+  const data = Object.fromEntries(formData.entries());
 
   try {
     const response = await fetch('https://formspree.io/f/mbdppeow', {
       method: 'POST',
-      body: data,
-      headers: { 'Accept': 'application/json' }
+      body: JSON.stringify(data),
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      }
     });
 
-    if (response.ok) {
+    const result = await response.json();
+
+    if (response.ok && result.ok) {
       form.reset();
       formSuccess.style.display = 'block';
       setTimeout(() => { formSuccess.style.display = 'none'; }, 6000);
     } else {
-      alert('Une erreur est survenue. Appelez-nous directement au 06 65 67 08 26.');
+      const msg = result.errors?.map(e => e.message).join(', ') || 'Erreur inconnue';
+      alert(`Erreur : ${msg}\nAppelez-nous au 06 65 67 08 26.`);
     }
-  } catch {
+  } catch (err) {
     alert('Erreur réseau. Appelez-nous directement au 06 65 67 08 26.');
   }
 
