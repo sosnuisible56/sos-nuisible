@@ -50,22 +50,36 @@ document.querySelectorAll('.service-card, .argument, .contact-item, .cities-grid
   observer.observe(el);
 });
 
-// ===== FORMULAIRE =====
+// ===== FORMULAIRE (Formspree) =====
 const form = document.getElementById('contactForm');
 const formSuccess = document.getElementById('formSuccess');
 
-form.addEventListener('submit', (e) => {
+form.addEventListener('submit', async (e) => {
   e.preventDefault();
   const btn = form.querySelector('button[type="submit"]');
   btn.textContent = 'Envoi en cours...';
   btn.disabled = true;
 
-  // Simulation d'envoi (à remplacer par un vrai backend ou service email)
-  setTimeout(() => {
-    form.reset();
-    btn.textContent = 'Envoyer ma demande →';
-    btn.disabled = false;
-    formSuccess.style.display = 'block';
-    setTimeout(() => { formSuccess.style.display = 'none'; }, 5000);
-  }, 1200);
+  const data = new FormData(form);
+
+  try {
+    const response = await fetch('https://formspree.io/sos.nuisible.56@gmail.com', {
+      method: 'POST',
+      body: data,
+      headers: { 'Accept': 'application/json' }
+    });
+
+    if (response.ok) {
+      form.reset();
+      formSuccess.style.display = 'block';
+      setTimeout(() => { formSuccess.style.display = 'none'; }, 6000);
+    } else {
+      alert('Une erreur est survenue. Appelez-nous directement au 06 65 67 08 26.');
+    }
+  } catch {
+    alert('Erreur réseau. Appelez-nous directement au 06 65 67 08 26.');
+  }
+
+  btn.textContent = 'Envoyer ma demande →';
+  btn.disabled = false;
 });
